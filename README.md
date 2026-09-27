@@ -9,38 +9,40 @@ Bifrost Sentinel is an autonomous developer reliability CLI that intercepts dest
 In modern continuous deployment pipelines, database schema migrations (such as table renames or column normalizations) frequently break running legacy application queries during rolling updates. Detecting these breaks currently requires heavy staging databases, manual review, or emergency post-incident rollbacks that risk service outages and data loss.
 
 ---
-
 ## End-to-End Architecture
-[ Developer PR / Migration ]
-│
-▼
-┌──────────────────┐
-│   analyzer.py    │ ──► Pre-flight static DDL risk scan (CWE mapped)
-└────────┬─────────┘
-▼
-┌──────────────────┐
-│   harvester.py   │ ──► Codebase query harvester (scans .py / .sql)
-└────────┬─────────┘
-▼
-┌──────────────────┐
-│   rehearsal.py   │ ──► In-memory sandbox execution (verifies breakage)
-└────────┬─────────┘
-▼
-┌──────────────────┐
-│    healer.py     │ ──► Autonomous backward-compatible VIEW synthesis
-└────────┬─────────┘
-▼
-┌──────────────────┐
-│   explainer.py   │ ──► Blast radius assessment & bifrost_remediation.sql
-└────────┬─────────┘
-▼
-┌──────────────────┐
-│      ui.py       │ ──► Compatibility matrix & Migration Safety Score
-└────────┬─────────┘
-▼
-┌──────────────────┐
-│   reporter.py    │ ──► Outputs: SARIF v2.1.0, JSON Audit, PR Comment
-└──────────────────┘
+
+```text
+[ Developer PR / Migration ] 
+             │
+             ▼
+    ┌──────────────────┐
+    │   analyzer.py    │ ──► Pre-flight static DDL risk scan (CWE mapped)
+    └────────┬─────────┘
+             ▼
+    ┌──────────────────┐
+    │   harvester.py   │ ──► Codebase query harvester (scans .py / .sql)
+    └────────┬─────────┘
+             ▼
+    ┌──────────────────┐
+    │   rehearsal.py   │ ──► In-memory sandbox execution (verifies breakage)
+    └────────┬─────────┘
+             ▼
+    ┌──────────────────┐
+    │    healer.py     │ ──► Autonomous backward-compatible VIEW synthesis
+    └────────┬─────────┘
+             ▼
+    ┌──────────────────┐
+    │   explainer.py   │ ──► Blast radius assessment & bifrost_remediation.sql
+    └────────┬─────────┘
+             ▼
+    ┌──────────────────┐
+    │      ui.py       │ ──► Compatibility matrix & Migration Safety Score
+    └────────┬─────────┘
+             ▼
+    ┌──────────────────┐
+    │   reporter.py    │ ──► Outputs: SARIF v2.1.0, JSON Audit, PR Comment
+    └──────────────────┘
+
 ## Core Capabilities
 
 1. **Pre-flight Static DDL Scanner (`analyzer.py`):** Catches `DROP COLUMN`, `TABLE RENAME`, `NOT NULL WITHOUT DEFAULT`, and `ADD CONSTRAINT` with line mapping and CWE taxonomy links.
