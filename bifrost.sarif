@@ -1,0 +1,194 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "bifrost",
+          "version": "1.0.0",
+          "informationUri": "https://github.com/bifrost-engine/bifrost",
+          "rules": [
+            {
+              "id": "TABLE_RENAME",
+              "name": "TableRename",
+              "shortDescription": {
+                "text": "TABLE RENAME"
+              },
+              "fullDescription": {
+                "text": "Renaming a table breaks all existing SQL queries that reference the original name without a coordinated, multi-step expand-contract deploy."
+              },
+              "helpUri": "https://github.com/bifrost-engine/bifrost",
+              "help": {
+                "text": "Table renames instantly break any client that has not yet deployed. Create the new table alongside the old one and use an expanding view pattern: expose both names via a VIEW until all clients are migrated, then drop the old name.",
+                "markdown": "Table renames instantly break any client that has not yet deployed. Create the new table alongside the old one and use an expanding view pattern: expose both names via a VIEW until all clients are migrated, then drop the old name."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "correctness",
+                  "database"
+                ],
+                "precision": "high",
+                "problem.severity": "error"
+              },
+              "relationships": [
+                {
+                  "target": {
+                    "id": "CWE-1059",
+                    "guid": "FFC64C90-42B6-44CE-8A7C-37EE2CE35F78",
+                    "toolComponent": {
+                      "name": "CWE",
+                      "guid": "FFC64C90-42B6-44CE-8A7C-37EE2CE35F78"
+                    }
+                  },
+                  "kinds": [
+                    "superset"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "NOT_NULL_WITHOUT_DEFAULT",
+              "name": "NotNullWithoutDefault",
+              "shortDescription": {
+                "text": "NOT NULL WITHOUT DEFAULT"
+              },
+              "fullDescription": {
+                "text": "Adding a NOT NULL constraint without a DEFAULT value causes INSERT failures for older application versions that omit the new column."
+              },
+              "helpUri": "https://github.com/bifrost-engine/bifrost",
+              "help": {
+                "text": "Adding NOT NULL without a DEFAULT causes INSERT failures on any client that does not yet supply the new column. Supply a DEFAULT value, or add the column as nullable first, backfill all rows, then add the NOT NULL constraint in a separate migration.",
+                "markdown": "Adding NOT NULL without a DEFAULT causes INSERT failures on any client that does not yet supply the new column. Supply a DEFAULT value, or add the column as nullable first, backfill all rows, then add the NOT NULL constraint in a separate migration."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "correctness",
+                  "database"
+                ],
+                "precision": "high",
+                "problem.severity": "error"
+              },
+              "relationships": [
+                {
+                  "target": {
+                    "id": "CWE-1006",
+                    "guid": "FFC64C90-42B6-44CE-8A7C-37EE2CE35F78",
+                    "toolComponent": {
+                      "name": "CWE",
+                      "guid": "FFC64C90-42B6-44CE-8A7C-37EE2CE35F78"
+                    }
+                  },
+                  "kinds": [
+                    "superset"
+                  ]
+                }
+              ]
+            }
+          ],
+          "supportedTaxonomies": [
+            {
+              "name": "CWE",
+              "version": "4.12",
+              "organization": "MITRE",
+              "shortDescription": {
+                "text": "Common Weakness Enumeration"
+              },
+              "guid": "FFC64C90-42B6-44CE-8A7C-37EE2CE35F78"
+            }
+          ]
+        }
+      },
+      "artifacts": [
+        {
+          "location": {
+            "uri": "v2_breaking.sql",
+            "uriBaseId": "%SRCROOT%"
+          },
+          "roles": [
+            "analysisTarget"
+          ]
+        }
+      ],
+      "results": [
+        {
+          "ruleId": "TABLE_RENAME",
+          "level": "error",
+          "message": {
+            "text": "TABLE RENAME detected: `ALTER TABLE users RENAME TO users_old;`. Table renames instantly break any client that has not yet deployed. Create the new table alongside the old one and use an expanding view pattern: expose both names via a VIEW until all clients are migrated, then drop the old name."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "v2_breaking.sql",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1
+                }
+              }
+            }
+          ],
+          "properties": {
+            "severity": "HIGH",
+            "match": "ALTER TABLE users RENAME TO users_old;"
+          }
+        },
+        {
+          "ruleId": "NOT_NULL_WITHOUT_DEFAULT",
+          "level": "error",
+          "message": {
+            "text": "NOT NULL WITHOUT DEFAULT detected: `first_name TEXT    NOT NULL`. Adding NOT NULL without a DEFAULT causes INSERT failures on any client that does not yet supply the new column. Supply a DEFAULT value, or add the column as nullable first, backfill all rows, then add the NOT NULL constraint in a separate migration."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "v2_breaking.sql",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 3,
+                  "startColumn": 1
+                }
+              }
+            }
+          ],
+          "properties": {
+            "severity": "HIGH",
+            "match": "first_name TEXT    NOT NULL"
+          }
+        },
+        {
+          "ruleId": "NOT_NULL_WITHOUT_DEFAULT",
+          "level": "error",
+          "message": {
+            "text": "NOT NULL WITHOUT DEFAULT detected: `last_name  TEXT    NOT NULL`. Adding NOT NULL without a DEFAULT causes INSERT failures on any client that does not yet supply the new column. Supply a DEFAULT value, or add the column as nullable first, backfill all rows, then add the NOT NULL constraint in a separate migration."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "v2_breaking.sql",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 3,
+                  "startColumn": 1
+                }
+              }
+            }
+          ],
+          "properties": {
+            "severity": "HIGH",
+            "match": "last_name  TEXT    NOT NULL"
+          }
+        }
+      ]
+    }
+  ]
+}
